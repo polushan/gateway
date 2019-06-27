@@ -1,0 +1,47 @@
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: https://discovery-cheerful-fox.cfapps.io/eureka
+  instance:
+    hostname: ${vcap.application.uris[0]}
+    nonSecurePort: 80
+
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: ping-service
+          uri: lb://ping-service
+          predicates:
+            - Path=/ping/**
+          filters:
+            - RewritePath=/ping/(?<path>.*), /$\{path}
+        - id: pong-service
+          uri: lb://pong-service
+          predicates:
+            - Path=/pong/**
+          filters:
+            - RewritePath=/pong/(?<path>.*), /$\{path}
+        - id: pingpong-view
+          uri: lb://pingpong-view
+          predicates:
+            - Path=/view/**
+          filters:
+            - RewritePath=/view/(?<path>.*), /$\{path}
+zuul:
+  routes:
+    ping:
+      path: /ping/**
+      serviceId: ping-service
+    pong:
+      path: /pong/**
+      serviceId: pong-service
+    view:
+      path: /view/**
+      serviceId: pingpong-view
