@@ -1,3 +1,6 @@
 spring:
   application:
     name: gateway
+  cloud:
+    config:
+      uri: https://config-service-patient-quoll.cfapps.io/
